@@ -1,0 +1,137 @@
+---
+title: "Unraveling UNICEF Data"
+subtitle: Exploring GDP and Obseravation Value of countries based off Unicef Data
+author: Andrew Lewis
+date: 2024/04/24
+format:
+  html:
+    toc: true
+    theme: minty
+    backgroundcolor: lightgrey
+warnings: false
+messgaes: false
+
+  
+---
+
+```{r}
+#| label: setup
+#| include: false
+
+#libraries 
+library(tidyverse)
+library(plotly)
+library(readr)
+library(readxl)
+```
+
+
+## Introduction 
+
+This report provides a comprehensive analysis of global economic patterns through a series of visualizations: a GDP map highlighting economic distribution worldwide, a bar plot comparing countries' GDP values, a scatter plot exploring the relationship between GDP and population and a timeline series charting GDP growth over time. Each visualization offers unique insights into the dynamics of the global economy, from geographical disparities and population impact to economic trends and development trajectories. Together, they paint a multifaceted picture of global economic health, guiding readers through the complexities of GDP as a critical measure of economic prosperity and growth.
+
+```{r}
+unicef_indicator_1 <- read_csv("unicef_indicator_1.csv")
+unicef_indicator_2 <- read_csv("unicef_indicator_2.csv")
+unicef_metadata_unicef_metadata <- read_csv("unicef_metadata - unicef_metadata.csv")
+
+```
+
+```{r}
+## GDP Map 
+##create mapping 
+
+
+
+bound_col <- list(color = toRGB("grey"), width = 0.5)
+g <- list(
+  showframe = F,
+  projection = list(type = 'Mercator')
+)
+
+data <- unicef_metadata_unicef_metadata
+fig2 <- plot_geo(data)
+
+fig2 <- fig2 %>% add_trace(
+  z = ~`GDP per capita (constant 2015 US$)`, color = ~`GDP per capita (constant 2015 US$)`, colors = 'Orange',
+  text = ~country, locations = ~alpha_3_code, marker = list(line = bound_col)
+)
+
+fig2 <- fig2 %>% colorbar(title = 'Observation value', tickprefix = '$')
+
+fig2 <- fig2 %>% layout(
+  title = 'GDP per capita value by country',
+  geo = g
+)
+fig2
+
+```
+
+
+ 
+The GDP map visually represents the economic output of countries around the world, using colour gradients to illustrate variations in GDP levels. It allows quick identification of economic powerhouses and regions with lower economic activity.
+
+## Observation Value by Country 
+
+
+```{r}
+###Bar plot 
+
+ggplot(unicef_indicator_1, aes(x = alpha_3_code, y = obs_value,fill=alpha_3_code)) +
+  geom_bar(stat = "identity") +
+  labs(x = "Country", y = "obs value", title = "obs value by Country") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplot(unicef_metadata_unicef_metadata, aes(x = alpha_2_code, y = `GDP per capita (constant 2015 US$)`,fill=alpha_3_code)) +
+  geom_bar(stat = "identity") +
+  labs(x = "Country", y = "GDP per Capita", title = "GDP per Capita by Country") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+ggplot(unicef_metadata_unicef_metadata, aes(x = alpha_3_code, y = `GDP per capita (constant 2015 US$)`,fill=alpha_3_code)) +
+  geom_bar(stat = "identity") +
+  labs(x = "Country", y = "obs value", title = "GDP per capita by Country") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+scale_fill_viridis_d()+coord_flip()
+
+
+
+``` 
+
+
+The observation value bar plot ranks countries by their GDP, using bars to compare economic sizes. This visualization highlights the disparities in wealth and economic capacity between nations, offering a clear, comparative perspective.
+
+## Scatter Plot GDP vs Life Expectancy 
+
+
+```{r}
+ggplot(unicef_metadata_unicef_metadata, aes(x = `Life expectancy at birth, total (years)`, y = `GDP per capita (constant 2015 US$)`)) +
+  geom_point() +geom_smooth(method = "lm", se = FALSE, color = "blue")+
+  labs(x = "life expectancy", y = "GDP per capita", title = "Scatter Plot of GDP vs Life expectancy") +   theme_minimal()
+
+
+```
+
+ 
+The scatter plot compares GDP against life expectancy for various countries, revealing correlations or anomalies in how population size influences economic output. This visualisation aids in identifying patterns and outliers in the global economic landscape.
+
+## Timeline Series Line chart GDP
+
+
+```{r}
+
+# Create a time series line chart for GDP over time
+ggplot(unicef_metadata_unicef_metadata, aes(x = year, y = `GDP per capita (constant 2015 US$)`)) +
+  geom_line() +
+  labs(x = "Year", y = "GDP", title = "Time Series Line Chart of GDP") +
+  theme_minimal()
+
+
+```
+
+
+The timeline series line chart traces the GDP growth of countries over time, illustrating trends, fluctuations, and economic milestones. It provides a historical view of economic development, highlighting how economies evolve and respond to global events.
+
+## Conclusion
+
+This report's visual analysis of global GDP through maps, plots, and charts offers deep insights into economic disparities, population impacts, and growth trends. It highlights the complex interplay between geography, population, and economic policy, fostering a better understanding of global economic health and development patterns.
+

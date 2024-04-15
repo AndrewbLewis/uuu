@@ -1,0 +1,136 @@
+---
+title: "Unicef Data - Quarto Assignment"
+output:
+  html_document: default
+  word_document: default
+  pdf_document: default
+date: "2024-04-07"
+---
+```{r}
+
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r cars}
+library(readr)
+
+unicef_indicator_1 <- unicef_indicator_1
+unicef_indicator_2 <- unicef_indicator_2
+unicef_metadata_unicef_metadata <- unicef_metadata_unicef_metadata
+
+##create mapping 
+library(plotly)
+head(unicef_indicator_1)
+bound_col <- list(color = toRGB("grey"), width = 0.5)
+g <- list(
+  showframe = F,
+  projection = list(type = 'Mercator')
+)
+
+fig <- plot_geo(unicef_indicator_2)
+fig <- fig %>% add_trace(
+  z = ~obs_value, color = ~obs_value, colors = 'Blues',
+  text = ~country, locations = ~alpha_3_code, marker = list(line = bound_col)
+)
+
+fig <- fig %>% colorbar(title = 'Observation value', tickprefix = '$')
+fig <- fig %>% layout(
+  title = 'Observation value by country',
+  geo = g
+)
+fig
+
+fig1 <- plot_geo(unicef_indicator_1)
+fig1 <- fig1 %>% add_trace(
+  z = ~obs_value, color = ~obs_value, colors = 'Blues',
+  text = ~country, locations = ~alpha_3_code, marker = list(line = bound_col)
+)
+
+fig1 <- fig1 %>% colorbar(title = 'Observation value', tickprefix = '$')
+fig1 <- fig1 %>% layout(
+  title = 'Observation value by country',
+  geo = g
+)
+fig1
+
+fig2 <- plot_geo(unicef_metadata_unicef_metadata)
+fig2 <- fig2 %>% add_trace(
+  z = ~`GDP per capita (constant 2015 US$)`, color = ~`GDP per capita (constant 2015 US$)`, colors = 'Orange',
+  text = ~country, locations = ~alpha_3_code, marker = list(line = bound_col)
+)
+
+fig2 <- fig2 %>% colorbar(title = 'Observation value', tickprefix = '$')
+fig2 <- fig2 %>% layout(
+  title = 'GDP per capita value by country',
+  geo = g
+)
+fig2
+
+
+###Bar plot 
+ggplot(unicef_indicator_1, aes(x = alpha_3_code, y = obs_value,fill=alpha_3_code)) +
+  geom_bar(stat = "identity") +
+  labs(x = "Country", y = "obs value", title = "obs value by Country") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+ggplot(unicef_indicator_1, aes(x = alpha_3_code, y = obs_value,fill=alpha_3_code)) +
+  geom_bar(stat = "identity") +
+  labs(x = "Country", y = "obs value", title = "obs value by Country") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+scale_fill_viridis_d()+coord_flip()
+
+ggplot(unicef_indicator_2, aes(x = alpha_3_code, y = obs_value,fill=alpha_3_code)) +
+  geom_bar(stat = "identity") +
+  labs(x = "Country", y = "obs value", title = "obs value by Country") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+ggplot(unicef_indicator_2, aes(x = alpha_3_code, y = obs_value,fill=alpha_3_code)) +
+  geom_bar(stat = "identity") +
+  labs(x = "Country", y = "obs value", title = "obs value by Country") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+scale_fill_viridis_d()+coord_flip()
+
+ggplot(unicef_metadata_unicef_metadata, aes(x = alpha_2_code, y = `GDP per capita (constant 2015 US$)`,fill=alpha_3_code)) +
+  geom_bar(stat = "identity") +
+  labs(x = "Country", y = "GDP per Capita", title = "GDP per Capita by Country") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+ggplot(unicef_metadata_unicef_metadata, aes(x = alpha_3_code, y = `GDP per capita (constant 2015 US$)`,fill=alpha_3_code)) +
+  geom_bar(stat = "identity") +
+  labs(x = "Country", y = "obs value", title = "GDP per capita by Country") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+scale_fill_viridis_d()+coord_flip()
+
+
+# Scatter plot ############
+
+  # Create a scatter plot for GDP vs. Life Expectancy
+ggplot(unicef_metadata_unicef_metadata, aes(x = `Life expectancy at birth, total (years)`, y = `GDP per capita (constant 2015 US$)`)) +
+  geom_point() +geom_smooth(method = "lm", se = FALSE, color = "blue")+
+  labs(x = "life expectancy", y = "GDP per capita", title = "Scatter Plot of GDP vs Population") +
+  theme_minimal()
+
+ggplot(unicef_metadata_unicef_metadata, aes(x = `Military expenditure (% of GDP)`, y = `GDP per capita (constant 2015 US$)`)) +
+  geom_point() + geom_smooth(method = "lm", se = FALSE, color = "blue")+
+  labs(x = "Military expenditure", y = "GDP per capita", title = "Scatter Plot of GDP vs. Military expenditure") +
+  theme_minimal()
+
+###### time series 
+# Assuming you have loaded the necessary libraries and merged your data frame with the world map data as described earlier
+
+# Create a time series line chart for GDP over time
+ggplot(unicef_metadata_unicef_metadata, aes(x = year, y = `GDP per capita (constant 2015 US$)`)) +
+  geom_line() +
+  labs(x = "Year", y = "GDP", title = "Time Series Line Chart of GDP") +
+  theme_minimal()
+
+
+###### Regression model 
+reg1 <- lm(unicef_metadata_unicef_metadata$`GDP per capita (constant 2015 US$)`~unicef_metadata_unicef_metadata$`Inflation, consumer prices (annual %)`+unicef_metadata_unicef_metadata$`Life expectancy at birth, total (years)`+unicef_metadata_unicef_metadata$`Military expenditure (% of GDP)`+unicef_metadata_unicef_metadata$`Population, total`)
+summary(reg1)
+
+
+```
